@@ -15,6 +15,10 @@ def resize_image(image):
     image_resize = cv2.resize(image, dimension, interpolation = cv2.INTER_AREA)
     return image_resize
 
+os.makedirs("./aux_image", exist_ok=True)
+os.makedirs("./extract_leaf", exist_ok=True)
+os.makedirs("./image_first_cut", exist_ok=True)
+os.makedirs("./image_second_cut", exist_ok=True)
 
 path = "./LuzBranca_Cima"
 for filename in os.listdir(path):
@@ -46,57 +50,57 @@ for filename in os.listdir(path):
         # cv2.imshow('imagem g', resize_image(img_G))
         # cv2.imshow('imagem r', resize_image(img_R))
 
-        nova = cv2.merge([img_B, img_G, img_R])
-        # cv2.imshow('imagem nova', resize_image(nova))
-        cv2.imwrite(f"imagens_auxiliares/{imagename}.jpg", nova)
+        new = cv2.merge([img_B, img_G, img_R])
+        # cv2.imshow('imagem new', resize_image(new))
+        cv2.imwrite(f"aux_image/{imagename}.jpg", new)
 
-        nova = cv2.imread(f"imagens_auxiliares/{imagename}.jpg")
-        # cv2.imshow('imagem nova', resize_image(nova))
+        new = cv2.imread(f"aux_image/{imagename}.jpg")
+        # cv2.imshow('imagem new', resize_image(new))
 
-        img_hsvnova = cv2.cvtColor(nova, cv2.COLOR_BGR2HSV)
-        # cv2.imshow('imagem hsv nova', resize_image(img_hsvnova))
+        img_hsvnew = cv2.cvtColor(new, cv2.COLOR_BGR2HSV)
+        # cv2.imshow('imagem hsv new', resize_image(img_hsvnew))
 
-        (img_Hnova, img_Snova, img_Vnova) = cv2.split(img_hsvnova)
-        # cv2.imshow('imagem h', resize_image(img_Hnova))
-        # cv2.imshow('imagem s', resize_image(img_Snova))
-        # cv2.imshow('imagem v', resize_image(img_Vnova))
+        (img_Hnew, img_Snew, img_Vnew) = cv2.split(img_hsvnew)
+        # cv2.imshow('imagem h', resize_image(img_Hnew))
+        # cv2.imshow('imagem s', resize_image(img_Snew))
+        # cv2.imshow('imagem v', resize_image(img_Vnew))
 
         #SUAVIZAÇÃO
-        suave = cv2.GaussianBlur(img_Hnova, (121, 121), 0) # aplica blur
-        # cv2.imshow('imagem suave', resize_image(suave))
+        soft = cv2.GaussianBlur(img_Hnew, (121, 121), 0) # aplica blur
+        # cv2.imshow('imagem soft', resize_image(soft))
 
         #LIMIARIZAÇÃO
         # apply Otsu's automatic thresholding which automatically determines
         # the best threshold value
-        (T, binI) = cv2.threshold(suave, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+        (T, binI) = cv2.threshold(soft, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
         # print("[INFO] otsu's thresholding value: {}".format(T))
 
         #Aplicação de MORFOLOGIA
         kernel = np.ones((75, 75), np.uint8) 
 
-        abertura = cv2.morphologyEx(binI, cv2.MORPH_OPEN, kernel,iterations=7)
-        # cv2.imshow('imagem abertura', resize_image(abertura))
+        open = cv2.morphologyEx(binI, cv2.MORPH_OPEN, kernel,iterations=7)
+        # cv2.imshow('imagem open', resize_image(open))
 
         # visualização da máscara aplicada à imagem original
-        resultado1 = cv2.bitwise_and(img_hsv, img_hsv, mask=abertura)
-        resultado2 = cv2.bitwise_and(img, img, mask=abertura)
-        # cv2.imshow('imagem res1', resize_image(resultado1))
-        # cv2.imshow('imagem res2', resize_image(resultado2))
+        result_1 = cv2.bitwise_and(img_hsv, img_hsv, mask=open)
+        result_2 = cv2.bitwise_and(img, img, mask=open)
+        # cv2.imshow('imagem res1', resize_image(result_1))
+        # cv2.imshow('imagem res2', resize_image(result_2))
 
         #ajuste de "bandas" apenas para usar o vstack para salvar o resultado
         binI = cv2.merge([binI, binI, binI])
-        abertura = cv2.merge([abertura, abertura, abertura])
+        open = cv2.merge([open, open, open])
         # cv2.imshow('imagem binI', resize_image(binI))
-        # cv2.imshow('imagem abertura', resize_image(abertura))
+        # cv2.imshow('imagem open', resize_image(open))
 
         #Juntando o resultado em um arquivo único
         imgResultado = np.vstack([
-            np.hstack([binI, abertura]),
-            np.hstack([resultado1, resultado2])
+            np.hstack([binI, open]),
+            np.hstack([result_1, result_2])
             ])
         # cv2.imshow('imagem result', resize_image(imgResultado))
 
-        (resb,resg,resr) = cv2.split(resultado2)
+        (resb,resg,resr) = cv2.split(result_2)
         # cv2.imshow('imagem b', resize_image(resb))
         # cv2.imshow('imagem g', resize_image(resg))
         # cv2.imshow('imagem r', resize_image(resr))
@@ -107,14 +111,14 @@ for filename in os.listdir(path):
         (T, binIg) = cv2.threshold(resg, 100, 255, cv2.THRESH_BINARY)
         # print("[INFO] otsu's thresholding value: {}".format(T))
 
-        binIgsuave = cv2.medianBlur(binIg, 11)
-        # cv2.imshow('imagem binIg Suave', resize_image(binIgsuave))
+        binIgsoft = cv2.medianBlur(binIg, 11)
+        # cv2.imshow('imagem binIg soft', resize_image(binIgsoft))
 
-        cv2.imwrite(f"folha_extraida/{imagename}.jpg", resultado2) 
+        cv2.imwrite(f"extract_leaf/{imagename}.jpg", result_2) 
 
 ''' End of extract leaf from image'''
 
-pathMass = "./folha_extraida"
+pathMass = "./extract_leaf"
 for filename in os.listdir(pathMass):
     if filename.endswith('.jpg'):
         imagename = filename[:-4]
