@@ -124,10 +124,19 @@ for filename in os.listdir(pathMass):
         imagename = filename[:-4]
 
         original = cv2.imread(path + "/" + filename)
-        img = cv2.imread(pathMass + "/" + filename, cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(pathMass + "/" + filename)
         # cv2.imshow('imagem', resize_image(img))
 
-        (T, binIm) = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
+        (resb,resg,resr) = cv2.split(img)
+        # cv2.imshow('imagem b', resize_image(resb))
+        # cv2.imshow('imagem g', resize_image(resg))
+        # cv2.imshow('imagem r', resize_image(resr))
+
+        #LIMIARIZAÇÃO
+        # apply Otsu's automatic thresholding which automatically determines
+        # the best threshold value
+        (T, binIg) = cv2.threshold(resg, 100, 255, cv2.THRESH_BINARY)
+        # print("[INFO] otsu's thresholding value: {}".format(T))
         # print("[INFO] otsu's thresholding value: {}".format(T))
         # print(f"Thresh: {binIm}")
         
@@ -154,7 +163,7 @@ for filename in os.listdir(pathMass):
         y = int(y_size)
         # print(f"X: {x}, Y: {y}")
 
-        cut = original[(y-100):(y+100), (x-100):(x+100)]
+        cut = original[(y-200):(y+200), (x-200):(x+200)]
         # cv2.imshow("Recorte da imagem", cut)
         cv2.imwrite(f"image_first_cut/{imagename}.jpg", cut) 
 
@@ -164,7 +173,7 @@ for filename in os.listdir(pathMass):
         y_center = int(height_orig // 2)
         x_center = int(width_orig // 2)
 
-        cut_2 = original[(y_center-100):(y_center+100), (x_center-100):(x_center+100)]
+        cut_2 = original[(y_center-200):(y_center+200), (x_center-200):(x_center+200)]
         # cv2.imshow("Recorte 2 da imagem", cut_2)
         cv2.imwrite(f"image_second_cut/{imagename}.jpg", cut_2)
 
