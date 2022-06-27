@@ -135,8 +135,7 @@ for filename in os.listdir(pathMass):
         #LIMIARIZAÇÃO
         # apply Otsu's automatic thresholding which automatically determines
         # the best threshold value
-        (T, binIg) = cv2.threshold(resg, 100, 255, cv2.THRESH_BINARY)
-        # print("[INFO] otsu's thresholding value: {}".format(T))
+        (T, binIm) = cv2.threshold(resg, 100, 255, cv2.THRESH_BINARY)
         # print("[INFO] otsu's thresholding value: {}".format(T))
         # print(f"Thresh: {binIm}")
         
