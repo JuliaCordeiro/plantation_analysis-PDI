@@ -21,7 +21,7 @@ with open('data_for_analysis.txt', 'w') as f:
     for x in range(16):
       f.write( f'@attribute cor{x+1} NUMERIC\n' )
 
-    f.write( '@attibute classe {T.1, T.2, T.3, T.4, T.5, T.6, T.7, T.8}\n' )
+    f.write( '@attribute classe {T.1, T.2, T.3, T.4, T.5, T.6, T.7, T.8}\n' )
     f.write( '\n' )
 
     f.write( '@DATA\n' )
