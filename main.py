@@ -179,5 +179,5 @@ for filename in os.listdir(pathMass):
 ''' End of cut image mass center'''
 
 print(datetime.now())
-#espera para fechar programa
-cv2.waitKey(0) #espera pressionar qualquer tecla
+
+cv2.waitKey(0)

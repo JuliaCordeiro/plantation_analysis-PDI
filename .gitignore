@@ -134,3 +134,6 @@ extract_leaf
 aux_image
 image_first_cut
 image_second_cut
+
+#Data to Analyse
+data_for_analysis.txt
